@@ -79,7 +79,7 @@ feature
 				position_changed := false
 
 				-- logging
-				print(id.out + ": border collision detected%N")
+				print("player " + id.out + ": border collision detected%N")
 
 			end
 

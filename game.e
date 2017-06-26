@@ -127,7 +127,7 @@ feature
 			end
 		end
 
-		print("("+last_rand.out+","+next_rand.out+") : " + grid.my_grid_array[last_rand, next_rand].out + "%N")
+		--print("("+last_rand.out+","+next_rand.out+") : " + grid.my_grid_array[last_rand, next_rand].out + "%N")
 		Result := create {POINT}.make (last_rand, next_rand)
 	end
 

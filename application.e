@@ -15,17 +15,15 @@ create
 feature {NONE} -- Initialization
 
 	make
-		local
-			l_app: EV_APPLICATION
 		do
-			create l_app
+			create snake_app
 			prepare
 				-- The next instruction launches GUI message processing.
 				-- It should be the last instruction of a creation procedure
 				-- that initializes GUI objects. Any other processing should
 				-- be done either by agents associated with GUI elements
 				-- or in a separate processor.
-			l_app.launch
+			snake_app.launch
 				-- No code should appear here,
 				-- otherwise GUI message processing will be stuck in SCOOP mode.
 		end
@@ -45,13 +43,14 @@ feature {NONE} -- Initialization
 
 		do
 				-- create and initialize the first window.
-			create first_window
+			create window
 
-			first_window.set_size (650, 600)
+			window.set_size (650, 600)
 				-- Show the first window.
 				--| TODO: Remove this line if you don't want the first
 				--|       window to be shown at the start of the program.
-			first_window.show
+
+			window.show
 
 			create console
 
@@ -61,18 +60,30 @@ feature {NONE} -- Initialization
 
 			create box
 			box.extend(console.text_area)
-			first_window.extend(box)
+			window.extend(box)
 
 			game.start (console)
 			running := true
 
-			first_window.key_press_actions.extend(agent handle_keyboard_input)
+			-- register some events
 
-			first_window.ev_application.add_idle_action(agent redraw)
+			window.close_request_actions.extend (agent on_close)
+
+			window.key_press_actions.extend(agent handle_keyboard_input)
+
+			window.ev_application.add_idle_action(agent redraw)
 
 		end
 
-feature {NONE}
+feature {NONE} -- events
+
+	on_close
+
+		do
+			--game.stop
+			window.destroy
+			snake_app.destroy
+		end
 
 	redraw
 
@@ -92,7 +103,9 @@ feature {NONE}
 
 feature {NONE} -- Access
 
-	first_window: EV_TITLED_WINDOW
+	snake_app: EV_APPLICATION
+
+	window: EV_TITLED_WINDOW
 			-- Main window.
 
 	game: GAME
