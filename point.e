@@ -10,8 +10,10 @@ class
 create
 	make
 
-feature {NONE}
+feature {NONE} -- Initialization
+
 	make (x_coord: INTEGER; y_coord: INTEGER)
+
 		require
 			x_coord > 0 and x_coord <= 30
 			y_coord > 0 and	y_coord <= 30
@@ -20,10 +22,12 @@ feature {NONE}
 			y := y_coord
 		end
 
-feature -- coordinates
+feature -- Access
 
 	x: INTEGER
+		-- x coordinate
 
 	y: INTEGER
+		-- y coordinate
 
 end

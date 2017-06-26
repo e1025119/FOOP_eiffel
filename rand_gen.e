@@ -17,8 +17,8 @@ inherit
 create
 	make
 
-feature {NONE}
-	make		-- Initialize structure using a default seed.
+feature {NONE}  -- Initialize structure using a default seed.
+	make
 		do
 			set_seed (default_seed)
 		end;
@@ -26,7 +26,7 @@ feature {NONE}
 feature
 	modulus: INTEGER
 		once
-			Result := 31
+			Result := 30
 		end;
 
 end

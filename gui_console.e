@@ -53,20 +53,4 @@ feature -- Basic operations
 			text_area.remove_text
 		end
 
-
-feature {NONE} -- Implementation
-
-	capitalized (s: STRING): STRING
-			-- String `s' with first letter capitalized.
-		require
-			s_exists: s /= Void
-		do
-			if s.is_empty or else not s [1].is_lower then
-				Result := s
-			else
-				Result := s.substring (2, s.count)
-				Result.precede (s [1].as_upper)
-			end
-		end
-
 end

@@ -12,6 +12,24 @@ inherit
 create
 	make
 
+
+feature {NONE} -- Access
+
+	snake_app: EV_APPLICATION
+
+	window: EV_TITLED_WINDOW
+			-- Main window.
+
+	game: GAME
+
+	console: GUI_CONSOLE
+
+	running: BOOLEAN
+
+	game_loop: PROCEDURE
+
+
+
 feature {NONE} -- Initialization
 
 	make
@@ -85,6 +103,7 @@ feature {NONE} -- events
 			snake_app.destroy
 		end
 
+
 	redraw
 
 		do
@@ -94,24 +113,24 @@ feature {NONE} -- events
 				--console.clear
 				console.output (game.grid.to_string)
 			else
-				-- TODO
+
 				-- evaluate game: Winner is the largest snake that is still alive at the end.
 				-- console print winner	
 
 				if (game.snake_a.is_alive) and (game.snake_b.is_alive) then
 					if (game.snake_a.size > game.snake_b.size) then
-						console.output ("%N%N%N%T%T%TPLAYER 1 WINS!!")
+						console.output (game.constants.player1_wins)
 					elseif (game.snake_b.size > game.snake_a.size) then
-						console.output ("%N%N%N%T%T%TPLAYER 2 WINS!!")
+						console.output (game.constants.player2_wins)
 					elseif (game.snake_a.size = game.snake_b.size) then
-						console.output ("%N%N%N%T%T%TBOTH WON!!")
+						console.output (game.constants.both_win)
 					end
 				elseif (game.snake_a.is_alive) then
-					console.output ("%N%N%N%T%T%TPLAYER 1 WINS!!")
+					console.output (game.constants.player1_wins)
 				elseif (game.snake_b.is_alive) then
-					console.output ("%N%N%N%T%T%TPLAYER 2 WINS!!")
+					console.output (game.constants.player2_wins)
 				else
-					console.output ("%N%N%N%T%T%TNO WINNER!!")
+					console.output (game.constants.noone_wins)
 				end
 
 				window.ev_application.remove_idle_action (game_loop)
@@ -120,26 +139,10 @@ feature {NONE} -- events
 		end
 
 
-feature {NONE} -- Access
-
-	snake_app: EV_APPLICATION
-
-	window: EV_TITLED_WINDOW
-			-- Main window.
-
-	game: GAME
-
-	console: GUI_CONSOLE
-
-	running: BOOLEAN
-
-	game_loop: PROCEDURE
-
-
 -- KEYBOARD INPUT
 
--- set constants
-feature {NONE}
+
+feature {NONE}	-- set constants
 
 	key_constants: EV_KEY_CONSTANTS
 
@@ -147,8 +150,8 @@ feature {NONE}
 			create Result
 		end
 
--- handling keyboard input
-feature {NONE}
+
+feature {NONE}	-- handling keyboard input
 
 	handle_keyboard_input (key: EV_KEY)
 

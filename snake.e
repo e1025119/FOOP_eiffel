@@ -25,9 +25,11 @@ feature -- Initialization
 
 			regained_size := 0
 
+			last_tail := create {POINT}.make (1, 1)
+
 			create body.make
-			-- fixed starting positions
-			if id = 1 then
+
+			if id = 1 then									 -- fixed starting positions
 				body.put_front (create {POINT}.make (18,15))
 				body.put_front (create {POINT}.make (17,15))
 				body.put_front (create {POINT}.make (16,15))
@@ -41,27 +43,61 @@ feature -- Initialization
 				create direction.make("DOWN")
 			end
 
-			--logging
 			io.putstring("player " + id.out + " created%N")
+				-- logging
 		end
 
-feature
-	move -- move snake into the current direction
+
+feature -- Access
+
+
+	body: LINKED_LIST [POINT]
+
+	health: INTEGER
+
+	size: INTEGER
+
+	is_alive: BOOLEAN
+
+	direction: DIRECTION
+
+	id: INTEGER
+		-- to identify player 1 or 2
+
+	last_tail: POINT
+		-- keep to append when size increases
+
+	border_collision: BOOLEAN
+
+	snake_collision: BOOLEAN
+
+	reset_unfinished: BOOLEAN
+
+	regained_size: INTEGER
+
+	constants: GAME_CONSTANTS
+
+		once
+			create Result
+		end
+
+
+feature -- move snake one field into the current direction
+
+	move
 
 		local
+
 			head: POINT
-			tail: POINT
 
 			position_changed: BOOLEAN
+
 		do
 
-			--if direction .... then create new head and delete last body part
-
-			-- get head element
 			head := body.first
+				-- get head element
 
 			position_changed := true
-
 
 			if direction.cur.is_equal ("UP") and head.x > 1 then
 				body.put_front (create {POINT}.make (head.x - 1, head.y))
@@ -72,22 +108,24 @@ feature
 			elseif direction.cur.is_equal ("RIGHT") and head.y < 30 then
 				body.put_front (create {POINT}.make (head.x, head.y + 1))
 			else
-				-- border collision detected
 
 				border_collision := true
+					-- border collision detected
 
 				position_changed := false
 
-				-- logging
+
 				print("player " + id.out + ": border collision detected%N")
+					-- logging
 
 			end
 
 			if position_changed = true and reset_unfinished = false then
 
-				-- remove last item
 				body.finish
+				last_tail := body.item
 				body.remove
+					-- remove last item
 
 			end
 
@@ -97,55 +135,25 @@ feature
 					reset_unfinished := false
 				end
 			end
+
 		end
 
-feature
+feature -- restets snake to the given position
+
 	reset (position : POINT)
+
 		do
 			create body.make
-			body.put_front(position) --new head
+			body.put_front (position) --new head
 			border_collision := false
 			reset_unfinished := true
 			regained_size := 1
 		end
 
 
-feature -- variables
+feature -- health manipulation
 
-	-- body
-	body: LINKED_LIST [POINT]
-
-	-- health
-	health: INTEGER
-
-	-- size
-	size: INTEGER
-
-	-- is snake still alive
-	is_alive: BOOLEAN
-
-	direction: DIRECTION
-
-	-- to identify player 1 or 2
-	id: INTEGER
-
-	border_collision: BOOLEAN
-	snake_collision: BOOLEAN
-
-	reset_unfinished: BOOLEAN
-	regained_size: INTEGER
-
-feature
-
-	constants: GAME_CONSTANTS
-
-		once
-			create Result
-		end
-
-feature
-
-	decrease_health (health_mod: INTEGER)
+	change_health (health_mod: INTEGER)
 
 		do
 			health := health + health_mod
@@ -154,14 +162,27 @@ feature
 			end
 		end
 
-	decrease_size (size_mod: INTEGER)
 
-	do
-		if size > 1 then
-			size := size + size_mod
+feature -- size manipulation
+
+	change_size (size_mod: INTEGER)
+
+		do
+			if size > 0 then
+				size := size + size_mod
+				if size_mod > 0 then -- grow
+
+					body.extend (last_tail)
+
+				else  -- shrink
+
+					body.finish
+					body.remove
+						-- remove last item
+
+				end
+			end
+
 		end
-
-	end
-
 
 end

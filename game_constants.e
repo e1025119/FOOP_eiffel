@@ -9,13 +9,22 @@ class
 
 feature
 
-	grid_size: INTEGER = 30 					-- 30 x 30 grid
+	grid_size: INTEGER = 30
+		-- 30 x 30 grid
 
 	border_health_decrease: INTEGER  = -1
 
 	snake_bite_health_decrease: INTEGER  = -1
 
 	own_bite_health_decrease: INTEGER = -1
+
+	artefact_size_increase_mod: INTEGER = 1
+
+	artefact_size_decrease_mod: INTEGER = -1
+
+	artefact_health_increase_mod: INTEGER = 1
+
+	artefact_health_decrease_mod: INTEGER = -1
 
 	snake_max_health: INTEGER = 5
 
@@ -47,7 +56,17 @@ feature
 	artefact_increase_size: STRING = "|g"
 	artefact_decrease_size: STRING = "|s"
 
-	artefact_increase_health: STRING = "h"
-	artefact_decrease_health: STRING = "e"
+	artefact_increase_health: STRING = "|h"
+	artefact_decrease_health: STRING = "|e"
+
+	-- evaluation
+
+	player1_wins: STRING = "%N%N%N%T%T%TPLAYER 1 WINS!!"
+
+	player2_wins: STRING = "%N%N%N%T%T%TPLAYER 2 WINS!!"
+
+	both_win: STRING = "%N%N%N%T%T%TBOTH WON!!"
+
+	noone_wins: STRING = "%N%N%N%T%T%TNO WINNER!!"
 
 end

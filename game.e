@@ -10,45 +10,11 @@ class
 inherit
 	EXECUTION_ENVIRONMENT
 
-create make
+create
+	make
 
-feature
+feature	-- Initialization
 
-	-- snake of player 1
-	snake_a: SNAKE
-
-	-- snake of player 2
-	snake_b: SNAKE
-
-	-- gamegrid
-	grid: GRID
-
-	-- predefined game time in seconds
-	--time: INTEGER
-
-	-- a list of artifacts
-	artefact_list: ARRAY[ARTEFACT]
-
-	running: BOOLEAN
-
-	random: RAND_GEN
-
-	last_rand: INTEGER
-
-
-feature
-
-	constants: GAME_CONSTANTS
-
-		once
-			create Result
-		end
-
-
-
-feature
-
-	-- initialization of all components
 	make
 
 		do
@@ -59,15 +25,56 @@ feature
 			create random.make
 			random.start
 
-			-- artifacts created on start
 			create artefact_list.make_empty
-			artefact_list.force(create {ARTEFACT}.make("SIZE_INCREASE", create {POINT}.make (2,5)), 1)
-			artefact_list.force (create {ARTEFACT}.make("SIZE_DECREASE", create {POINT}.make (24,18)), 2)
+				-- artifacts created on start
+			artefact_list.force (create {PERMANENT_ARTEFACT}.make(artefact_types.size_increase, create {POINT}.make (2,5), 1), 1)
+			artefact_list.force (create {PERMANENT_ARTEFACT}.make(artefact_types.size_decrease, create {POINT}.make (24,18), -1), 2)
+			artefact_list.force (create {PERMANENT_ARTEFACT}.make(artefact_types.health_increase, create {POINT}.make (7,17), 1), 3)
+			artefact_list.force (create {PERMANENT_ARTEFACT}.make(artefact_types.health_decrease, create {POINT}.make (21,23), -1), 4)
 
 		end
 
 
-	-- start a new game and init all components
+feature -- Access
+
+	snake_a: SNAKE
+		-- snake of player 1
+
+	snake_b: SNAKE
+		-- snake of player 2
+
+	grid: GRID
+		-- gamegrid (30 x 30)
+
+	--time: INTEGER
+		-- predefined game time in seconds
+
+	artefact_list: ARRAY[PERMANENT_ARTEFACT]
+		-- all artefacts that were created in this game
+
+	running: BOOLEAN
+
+	random: RAND_GEN
+		-- used for snake reset
+
+	x_rand: INTEGER
+		-- used for snake reset
+
+	constants: GAME_CONSTANTS
+
+		once
+			create Result
+		end
+
+	artefact_types: ARTEFACT_TYPE
+
+		once
+			create Result
+		end
+
+
+feature -- start a new game and init all components
+
 	start (console : GUI_CONSOLE)
 
 		do
@@ -78,7 +85,10 @@ feature
 
 		end
 
+feature	-- one step of the game loop
+
 	step
+
 		local
 
 			pos: POINT
@@ -91,6 +101,8 @@ feature
 
 				check_for_snake_collisions
 
+				check_for_artefact_collisions
+
 				if snake_a.border_collision = true or snake_b.border_collision = true then
 
 					pos := find_respawn_pos
@@ -98,10 +110,11 @@ feature
 					-- reset snakes
 
 					if snake_a.border_collision = true then
-						snake_a.decrease_health (constants.border_health_decrease)
+						snake_a.change_health (constants.border_health_decrease)
 						snake_a.reset(pos)
-					else
-						snake_b.decrease_health (constants.border_health_decrease)
+					end
+					if snake_b.border_collision = true then
+						snake_b.change_health (constants.border_health_decrease)
 						snake_b.reset(pos)
 					end
 
@@ -121,41 +134,41 @@ feature
 			running := run
 		end
 
-feature
+feature	-- helper function that returns a random free grid cell
+
 	find_respawn_pos: POINT
 
 	local
 
-		next_rand: INTEGER
+		y_rand: INTEGER
 
 		empty_cell_found: BOOLEAN
 
 	do
-		-- find a free grid position
-
 		from empty_cell_found := false
 		until empty_cell_found = true
 		loop
 			random.forth
-			last_rand := random.item
+			x_rand := random.item
 			random.forth
-			next_rand := random.item
-			--print(last_rand.out + "%N")
-			--print(next_rand.out + "%N")
+			y_rand := random.item
+			--print(x_rand.out + "%N")
+			--print(y_rand.out + "%N")
 
 			random.set_seed (random.seed - grid.my_grid_array.occurrences (0))
 			--print(random.seed.out + "%N")
 
-			if grid.my_grid_array[last_rand, next_rand] = 0 then
+			if grid.my_grid_array[x_rand + 1, y_rand + 1] = 0 then
 				empty_cell_found := true
 			end
 		end
 
-		--print("("+last_rand.out+","+next_rand.out+") : " + grid.my_grid_array[last_rand, next_rand].out + "%N")
-		Result := create {POINT}.make (last_rand, next_rand)
+		--print("("+x_rand.out+","+y_rand.out+") : " + grid.my_grid_array[x_rand, y_rand].out + "%N")
+		Result := create {POINT}.make (x_rand + 1, y_rand + 1)
 	end
 
-feature
+feature -- detects collisions with other snakes
+
 	check_for_snake_collisions
 
 		local
@@ -171,12 +184,13 @@ feature
 			if (head_a.x = head_b.x) and (head_a.y = head_b.y) then -- they bite each other
 
 				-- decrease health
-				snake_a.decrease_health (constants.snake_bite_health_decrease)
-				snake_b.decrease_health (constants.snake_bite_health_decrease)
+				snake_a.change_health (constants.snake_bite_health_decrease)
+				snake_b.change_health (constants.snake_bite_health_decrease)
 
 				-- reset both
 				snake_a.reset (find_respawn_pos)
 				snake_b.reset (find_respawn_pos)
+
 				--logging
 				print ("SNAKE_COLLISION: a bites b, b bites a%N")
 
@@ -193,7 +207,7 @@ feature
 			if index = true then -- a bites b
 
 				-- decrease health
-				snake_b.decrease_health (constants.snake_bite_health_decrease)
+				snake_b.change_health (constants.snake_bite_health_decrease)
 
 				-- reset b
 				snake_b.reset (find_respawn_pos)
@@ -214,7 +228,7 @@ feature
 			if index = true then -- b bites a
 
 				-- decrease health
-				snake_a.decrease_health (constants.snake_bite_health_decrease)
+				snake_a.change_health (constants.snake_bite_health_decrease)
 
 				-- reset a
 				snake_a.reset (find_respawn_pos)
@@ -222,6 +236,76 @@ feature
 				-- logging
 				print ("SNAKE_COLLISION: b bites a%N")
 
+			end
+		end
+
+feature
+
+	check_for_artefact_collisions
+
+		local
+			head_a: POINT
+			head_b: POINT
+
+			art: PERMANENT_ARTEFACT
+
+
+
+		do
+			head_a := snake_a.body[1]
+			head_b := snake_b.body[1]
+
+			across artefact_list as artefact
+			loop
+
+				art := artefact.item
+
+				if (art.is_active) then
+
+					if (art.position.x = head_a.x and art.position.y = head_a.y) then -- snake 1 collides with an artefact
+
+						handle_artefact_type(snake_a, art)
+
+						--logging
+						print ("ARTEFACT_COLLISION: snake_a eats " + art.type + "%N")
+
+					end
+
+					if (art.position.x = head_b.x and art.position.y = head_b.y) then -- snake 2 collides with an artefact
+
+						handle_artefact_type(snake_b, art)
+
+						--logging
+						print ("ARTEFACT_COLLISION: snake_b eats " + art.type + "%N")
+
+					end
+
+
+				end
+
+
+			end
+
+
+		end
+
+feature
+
+	handle_artefact_type (snake: SNAKE; art: PERMANENT_ARTEFACT)
+
+		do
+			if (art.type = artefact_types.size_increase) then
+				snake.change_size (art.value)
+				art.destroy
+			elseif (art.type = artefact_types.size_decrease) then
+				snake.change_size (art.value)
+				art.destroy
+			elseif (art.type = artefact_types.health_increase) then
+				snake.change_health (art.value)
+				art.destroy
+			elseif (art.type = artefact_types.health_decrease) then
+				snake.change_health (art.value)
+				art.destroy
 			end
 		end
 

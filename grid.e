@@ -9,25 +9,30 @@ class
 
 create init
 
-feature
+feature -- Initialization
 
 	init
 		do
 			create my_grid_array.make_filled (0, constants.grid_size, constants.grid_size)
 		end
 
-feature
+
+feature -- Access
+
+	my_grid_array: ARRAY2[INTEGER]
 
 	constants: GAME_CONSTANTS
 		once
 			create Result
 		end
 
-feature
+	artefact_types: ARTEFACT_TYPE
+		once
+			create Result
+		end
 
-	my_grid_array: ARRAY2[INTEGER]
 
-feature
+feature -- draws the game elements (snakes, artefacts) to an empty grid
 
 	draw (snake_a : SNAKE; snake_b: SNAKE; artefact_list: ARRAY[ARTEFACT])
 
@@ -39,11 +44,22 @@ feature
 			art: ARTEFACT
 
 		do
-			-- reset grid to 0
+			-- grid codes
+			-- 0 ... empty cell
+			-- 1 ... snake_a head
+			-- 2 ... snake_b head
+			-- 3 ... snake body parts
+			-- 4 ... size increase artefact
+			-- 5 ... size decrease artefact
+			-- 6 ... health increase artefact
+			-- 7 ... health decrease artefact
+
 			my_grid_array.make_filled (0, constants.grid_size, constants.grid_size)
+				-- reset grid to 0
 
 			head_a := true
 			head_b := true
+
 			across snake_a.body as point
 			loop
 				if head_a = true then
@@ -68,16 +84,23 @@ feature
 			loop
 				art := artefact.item
 				if art.is_active then
-					if art.type.is_equal ("SIZE_INCREASE") then
+					if art.type.is_equal (artefact_types.size_increase) then
 						my_grid_array[art.position.x, art.position.y] := 4
-					elseif art.type.is_equal ("SIZE_DECREASE") then
+					elseif art.type.is_equal (artefact_types.size_decrease) then
 						my_grid_array[art.position.x, art.position.y] := 5
+					elseif art.type.is_equal (artefact_types.health_increase) then
+						my_grid_array[art.position.x, art.position.y] := 6
+					elseif art.type.is_equal (artefact_types.health_decrease) then
+						my_grid_array[art.position.x, art.position.y] := 7
 					end
 
 				end
 			end
 
 		end
+
+
+feature -- returns a string representation of the grid
 
 	to_string: STRING
 
@@ -115,6 +138,10 @@ feature
 						my_grid := my_grid + constants.artefact_increase_size
 					elseif my_grid_array[i,x] = 5 then
 						my_grid := my_grid + constants.artefact_decrease_size
+					elseif my_grid_array[i,x] = 6 then
+						my_grid := my_grid + constants.artefact_increase_health
+					elseif my_grid_array[i,x] = 7 then
+						my_grid := my_grid + constants.artefact_decrease_health
 					end
 					x := x + 1
 				end

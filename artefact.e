@@ -4,25 +4,8 @@ note
 	date: "$Date$"
 	revision: "$Revision$"
 
-class
+deferred class
 	ARTEFACT
-
-create
-	make
-
-feature
-	make (t: STRING; pos: POINT)
-		do
-			type := t
-			is_active := true
-			position := pos
-		end
-
-feature
-	destroy
-		do
-			is_active := false
-		end
 
 feature
 
