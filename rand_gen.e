@@ -26,7 +26,7 @@ feature {NONE}
 feature
 	modulus: INTEGER
 		once
-			Result := 30
+			Result := 31
 		end;
 
 end

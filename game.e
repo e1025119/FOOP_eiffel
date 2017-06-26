@@ -35,6 +35,17 @@ feature
 
 	last_rand: INTEGER
 
+
+feature
+
+	constants: GAME_CONSTANTS
+
+		once
+			create Result
+		end
+
+
+
 feature
 
 	-- initialization of all components
@@ -60,10 +71,8 @@ feature
 	start (console : GUI_CONSOLE)
 
 		do
-			-- make a loop here to draw every step
-
+			running := true
 			grid.draw (snake_a, snake_b, artefact_list)
-
 			console.clear
 			console.output (grid.to_string)
 
@@ -75,26 +84,41 @@ feature
 			pos: POINT
 
 		do
-			snake_a.move
-			snake_b.move
+			if snake_a.is_alive = true and snake_b.is_alive = true then
 
-			check_for_snake_collisions
+				snake_a.move
+				snake_b.move
 
-			if snake_a.border_collision = true or snake_b.border_collision = true then
+				check_for_snake_collisions
 
-				pos := find_respawn_pos
+				if snake_a.border_collision = true or snake_b.border_collision = true then
 
-				-- reset snakes
+					pos := find_respawn_pos
 
-				if snake_a.border_collision = true then
-					snake_a.reset(pos)
-				else
-					snake_b.reset(pos)
+					-- reset snakes
+
+					if snake_a.border_collision = true then
+						snake_a.decrease_health (constants.border_health_decrease)
+						snake_a.reset(pos)
+					else
+						snake_b.decrease_health (constants.border_health_decrease)
+						snake_b.reset(pos)
+					end
+
+
 				end
+				grid.draw (snake_a, snake_b, artefact_list)
 
-
+			else
+				running := false
 			end
-			grid.draw (snake_a, snake_b, artefact_list)
+
+		end
+
+	set_running (run : BOOLEAN)
+
+		do
+			running := run
 		end
 
 feature
@@ -145,7 +169,11 @@ feature
 			head_b := snake_b.body[1]
 
 			if (head_a.x = head_b.x) and (head_a.y = head_b.y) then -- they bite each other
-				-- TODO decrease size
+
+				-- decrease health
+				snake_a.decrease_health (constants.snake_bite_health_decrease)
+				snake_b.decrease_health (constants.snake_bite_health_decrease)
+
 				-- reset both
 				snake_a.reset (find_respawn_pos)
 				snake_b.reset (find_respawn_pos)
@@ -163,11 +191,16 @@ feature
 
 			end
 			if index = true then -- a bites b
-				-- TODO decrease size
+
+				-- decrease health
+				snake_b.decrease_health (constants.snake_bite_health_decrease)
+
 				-- reset b
 				snake_b.reset (find_respawn_pos)
+
 				-- logging
 				print ("SNAKE_COLLISION: a bites b%N")
+
 			end
 
 			index := false
@@ -179,17 +212,17 @@ feature
 
 			end
 			if index = true then -- b bites a
-				-- TODO decrease size
+
+				-- decrease health
+				snake_a.decrease_health (constants.snake_bite_health_decrease)
+
 				-- reset a
 				snake_a.reset (find_respawn_pos)
+
 				-- logging
 				print ("SNAKE_COLLISION: b bites a%N")
+
 			end
-
-
-
 		end
-
-
 
 end

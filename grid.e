@@ -13,36 +13,19 @@ feature
 
 	init
 		do
-			create my_grid_array.make_filled (0, grid_size, grid_size)
+			create my_grid_array.make_filled (0, constants.grid_size, constants.grid_size)
 		end
 
 feature
 
-	grid_size: INTEGER = 30
+	constants: GAME_CONSTANTS
+		once
+			create Result
+		end
+
+feature
 
 	my_grid_array: ARRAY2[INTEGER]
-
-	-- general cell appearance
-
-	empty_cell: STRING = "|_"
-
-	end_of_line: STRING = "|%N"
-
-	-- snake appearance
-
-	body_snake: STRING = "|x"
-
-	head_snake_a: STRING = "|a"
-
-	head_snake_b: STRING = "|b"
-
-	-- artifact appearance
-
-	artefact_increase_size: STRING = "|g"
-	artefact_decrease_size: STRING = "|s"
-
-	artefact_increase_health: STRING = "h"
-	artefact_decrease_health: STRING = "e"
 
 feature
 
@@ -57,7 +40,7 @@ feature
 
 		do
 			-- reset grid to 0
-			my_grid_array.make_filled (0, grid_size, grid_size)
+			my_grid_array.make_filled (0, constants.grid_size, constants.grid_size)
 
 			head_a := true
 			head_b := true
@@ -113,29 +96,29 @@ feature
 			from
 				i := 1
 			until
-				i > grid_size
+				i > constants.grid_size
 			loop
 				from
 					x := 1
 				until
-					x > grid_size
+					x > constants.grid_size
 				loop
 					if my_grid_array[i,x] = 0 then
-						my_grid := my_grid + empty_cell
+						my_grid := my_grid + constants.empty_cell
 					elseif my_grid_array[i,x] = 1 then
-						my_grid := my_grid + head_snake_a
+						my_grid := my_grid + constants.head_snake_a
 					elseif my_grid_array[i,x] = 2 then
-						my_grid := my_grid + head_snake_b
+						my_grid := my_grid + constants.head_snake_b
 					elseif my_grid_array[i,x] = 3 then
-						my_grid := my_grid + body_snake
+						my_grid := my_grid + constants.body_snake
 					elseif my_grid_array[i,x] = 4 then
-						my_grid := my_grid + artefact_increase_size
+						my_grid := my_grid + constants.artefact_increase_size
 					elseif my_grid_array[i,x] = 5 then
-						my_grid := my_grid + artefact_decrease_size
+						my_grid := my_grid + constants.artefact_decrease_size
 					end
 					x := x + 1
 				end
-				my_grid := my_grid + end_of_line
+				my_grid := my_grid + constants.end_of_line
 				i := i + 1
 			end
 			Result := my_grid

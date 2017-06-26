@@ -63,7 +63,6 @@ feature {NONE} -- Initialization
 			window.extend(box)
 
 			game.start (console)
-			running := true
 
 			-- register some events
 
@@ -88,7 +87,7 @@ feature {NONE} -- events
 	redraw
 
 		do
-			if running = true then
+			if game.running = true then
 				sleep (10000)
 				game.step
 				--console.clear
@@ -166,9 +165,9 @@ feature {NONE}
 			end
 
 			-- keys for pause, start, end ???
-			if key.code = key_constants.key_back_space then
+			if key.code = key_constants.key_enter then
 				print ("end game")
-				running := false
+				game.set_running (false)
 			end
 		end
 

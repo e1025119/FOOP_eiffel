@@ -16,8 +16,9 @@ feature -- Initialization
 
 		do
 			id := player
-			isalive := true
-			size := 4
+			is_alive := true
+			size := constants.snake_default_size
+			health := constants.snake_default_health
 
 			border_collision := false
 			reset_unfinished := false
@@ -73,7 +74,6 @@ feature
 			else
 				-- border collision detected
 
-
 				border_collision := true
 
 				position_changed := false
@@ -116,13 +116,13 @@ feature -- variables
 	body: LINKED_LIST [POINT]
 
 	-- health
-	--health: INTEGER
+	health: INTEGER
 
 	-- size
 	size: INTEGER
 
 	-- is snake still alive
-	isalive: BOOLEAN
+	is_alive: BOOLEAN
 
 	direction: DIRECTION
 
@@ -134,5 +134,25 @@ feature -- variables
 
 	reset_unfinished: BOOLEAN
 	regained_size: INTEGER
+
+feature
+
+	constants: GAME_CONSTANTS
+
+		once
+			create Result
+		end
+
+feature
+
+	decrease_health (health_mod: INTEGER)
+
+		do
+			health := health + health_mod
+			if health = 0 then
+				is_alive := false
+			end
+		end
+
 
 end
