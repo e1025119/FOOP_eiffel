@@ -91,7 +91,7 @@ feature
 
 			end
 
-			if position_changed = true and reset_unfinished = true then
+			if reset_unfinished = true then
 				regained_size := regained_size + 1
 				if regained_size = size then
 					reset_unfinished := false

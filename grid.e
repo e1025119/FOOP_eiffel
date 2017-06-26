@@ -13,20 +13,14 @@ feature
 
 	init
 		do
-			create my_grid_array.make_filled (0, 30, 30)
-
-			-- artifacts created on start
-			create artefact_list.make_empty
-			artefact_list.force(create {ARTEFACT}.make("SIZE_INCREASE", create {POINT}.make (2,5)), 1)
-			artefact_list.force (create {ARTEFACT}.make("SIZE_DECREASE", create {POINT}.make (24,18)), 2)
-
+			create my_grid_array.make_filled (0, grid_size, grid_size)
 		end
 
 feature
 
-	my_grid_array: ARRAY2[INTEGER]
+	grid_size: INTEGER = 30
 
-	artefact_list: ARRAY[ARTEFACT]
+	my_grid_array: ARRAY2[INTEGER]
 
 	-- general cell appearance
 
@@ -52,7 +46,7 @@ feature
 
 feature
 
-	draw (snake_a : SNAKE; snake_b: SNAKE) -- artifacts
+	draw (snake_a : SNAKE; snake_b: SNAKE; artefact_list: ARRAY[ARTEFACT])
 
 		local
 			head_a: BOOLEAN
@@ -63,7 +57,7 @@ feature
 
 		do
 			-- reset grid to 0
-			my_grid_array.make_filled (0, 30, 30)
+			my_grid_array.make_filled (0, grid_size, grid_size)
 
 			head_a := true
 			head_b := true
@@ -119,12 +113,12 @@ feature
 			from
 				i := 1
 			until
-				i > 30
+				i > grid_size
 			loop
 				from
 					x := 1
 				until
-					x > 30
+					x > grid_size
 				loop
 					if my_grid_array[i,x] = 0 then
 						my_grid := my_grid + empty_cell
