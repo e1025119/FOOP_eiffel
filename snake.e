@@ -154,5 +154,14 @@ feature
 			end
 		end
 
+	decrease_size (size_mod: INTEGER)
+
+	do
+		if size > 1 then
+			size := size + size_mod
+		end
+
+	end
+
 
 end

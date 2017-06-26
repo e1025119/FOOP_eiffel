@@ -39,8 +39,6 @@ feature {NONE} -- Initialization
 
 			box: EV_VERTICAL_BOX
 
-			x: INTEGER
-
 		do
 				-- create and initialize the first window.
 			create window
@@ -64,13 +62,16 @@ feature {NONE} -- Initialization
 
 			game.start (console)
 
+			game_loop := agent redraw
+
 			-- register some events
 
 			window.close_request_actions.extend (agent on_close)
 
 			window.key_press_actions.extend(agent handle_keyboard_input)
 
-			window.ev_application.add_idle_action(agent redraw)
+			window.ev_application.add_idle_action(game_loop)
+
 
 		end
 
@@ -96,15 +97,24 @@ feature {NONE} -- events
 				-- TODO
 				-- evaluate game: Winner is the largest snake that is still alive at the end.
 				-- console print winner	
-				if game.snake_a.is_alive and (game.snake_a.size > game.snake_b.size) then
+
+				if (game.snake_a.is_alive) and (game.snake_b.is_alive) then
+					if (game.snake_a.size > game.snake_b.size) then
+						console.output ("%N%N%N%T%T%TPLAYER 1 WINS!!")
+					elseif (game.snake_b.size > game.snake_a.size) then
+						console.output ("%N%N%N%T%T%TPLAYER 2 WINS!!")
+					elseif (game.snake_a.size = game.snake_b.size) then
+						console.output ("%N%N%N%T%T%TBOTH WON!!")
+					end
+				elseif (game.snake_a.is_alive) then
 					console.output ("%N%N%N%T%T%TPLAYER 1 WINS!!")
-
-				elseif game.snake_b.is_alive and (game.snake_b.size > game.snake_a.size) then
+				elseif (game.snake_b.is_alive) then
 					console.output ("%N%N%N%T%T%TPLAYER 2 WINS!!")
-
 				else
-					console.output ("%N%N%N%T%T%TBOTH WON!!")
+					console.output ("%N%N%N%T%T%TNO WINNER!!")
 				end
+
+				window.ev_application.remove_idle_action (game_loop)
 
 			end
 		end
@@ -122,6 +132,8 @@ feature {NONE} -- Access
 	console: GUI_CONSOLE
 
 	running: BOOLEAN
+
+	game_loop: PROCEDURE
 
 
 -- KEYBOARD INPUT
