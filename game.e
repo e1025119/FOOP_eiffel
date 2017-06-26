@@ -244,12 +244,11 @@ feature
 	check_for_artefact_collisions
 
 		local
+
 			head_a: POINT
 			head_b: POINT
 
 			art: PERMANENT_ARTEFACT
-
-
 
 		do
 			head_a := snake_a.body[1]
@@ -289,24 +288,35 @@ feature
 
 		end
 
-feature
+feature -- handles a specific artefact collision with the given snake
+		-- respawns another artefact of the same type on the grid
 
 	handle_artefact_type (snake: SNAKE; art: PERMANENT_ARTEFACT)
 
+		require
+			snake /= Void
+			art /= Void
 		do
 			if (art.type = artefact_types.size_increase) then
 				snake.change_size (art.value)
-				art.destroy
+				--art.destroy
+				artefact_list.enter (create {PERMANENT_ARTEFACT}.make(artefact_types.size_increase, find_respawn_pos, 1), 1)
 			elseif (art.type = artefact_types.size_decrease) then
 				snake.change_size (art.value)
-				art.destroy
+				--art.destroy
+				artefact_list.enter (create {PERMANENT_ARTEFACT}.make(artefact_types.size_decrease, find_respawn_pos, -1), 2)
 			elseif (art.type = artefact_types.health_increase) then
 				snake.change_health (art.value)
-				art.destroy
+				--art.destroy
+				artefact_list.enter (create {PERMANENT_ARTEFACT}.make(artefact_types.health_increase, find_respawn_pos, 1), 3)
 			elseif (art.type = artefact_types.health_decrease) then
 				snake.change_health (art.value)
-				art.destroy
+				--art.destroy
+				artefact_list.enter (create {PERMANENT_ARTEFACT}.make(artefact_types.health_decrease, find_respawn_pos, 1), 4)
 			end
+
+--		ensure
+--		art.is_active = false
 		end
 
 end
