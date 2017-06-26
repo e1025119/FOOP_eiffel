@@ -94,8 +94,18 @@ feature {NONE} -- events
 				console.output (game.grid.to_string)
 			else
 				-- TODO
-				-- evaluate game
+				-- evaluate game: Winner is the largest snake that is still alive at the end.
 				-- console print winner	
+				if game.snake_a.is_alive and (game.snake_a.size > game.snake_b.size) then
+					console.output ("%N%N%N%T%T%TPLAYER 1 WINS!!")
+
+				elseif game.snake_b.is_alive and (game.snake_b.size > game.snake_a.size) then
+					console.output ("%N%N%N%T%T%TPLAYER 2 WINS!!")
+
+				else
+					console.output ("%N%N%N%T%T%TBOTH WON!!")
+				end
+
 			end
 		end
 
