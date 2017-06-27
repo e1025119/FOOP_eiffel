@@ -189,7 +189,7 @@ feature {NONE}	-- handling keyboard input
 				game.snake_b.direction.set_current ("RIGHT")
 			end
 
-			-- keys for pause, start, end ???
+			-- keys for pause, start, end
 			if key.code = key_constants.key_enter then
 				print ("end game")
 				game.set_running (false)

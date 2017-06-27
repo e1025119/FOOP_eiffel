@@ -243,6 +243,10 @@ feature
 
 	check_for_artefact_collisions
 
+		require
+			snake_a.body.count > 0
+			snake_b.body.count > 0
+
 		local
 
 			head_a: POINT
@@ -293,9 +297,6 @@ feature -- handles a specific artefact collision with the given snake
 
 	handle_artefact_type (snake: SNAKE; art: PERMANENT_ARTEFACT)
 
-		require
-			snake /= Void
-			art /= Void
 		do
 			if (art.type = artefact_types.size_increase) then
 				snake.change_size (art.value)

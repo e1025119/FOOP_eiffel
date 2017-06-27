@@ -136,6 +136,9 @@ feature -- move snake one field into the current direction
 				end
 			end
 
+		ensure
+			body.count <= size
+
 		end
 
 feature -- restets snake to the given position
@@ -146,8 +149,11 @@ feature -- restets snake to the given position
 			create body.make
 			body.put_front (position) --new head
 			border_collision := false
-			reset_unfinished := true
 			regained_size := 1
+			if regained_size < size then
+				reset_unfinished := true
+			end
+
 		end
 
 
@@ -155,6 +161,8 @@ feature -- health manipulation
 
 	change_health (health_mod: INTEGER)
 
+		require
+			health >= health_mod.abs
 		do
 			health := health + health_mod
 			if health = 0 then
@@ -167,8 +175,10 @@ feature -- size manipulation
 
 	change_size (size_mod: INTEGER)
 
+		require
+			size >= size_mod.abs
 		do
-			if size > 0 then
+			if size > 1 then
 				size := size + size_mod
 				if size_mod > 0 then -- grow
 
@@ -182,7 +192,11 @@ feature -- size manipulation
 
 				end
 			end
-
+		ensure
+			size > 0
 		end
+
+invariant
+	health >= 0
 
 end

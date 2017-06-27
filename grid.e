@@ -104,6 +104,9 @@ feature -- returns a string representation of the grid
 
 	to_string: STRING
 
+		require
+			my_grid_array.full
+
 		local
 
 			i: INTEGER
@@ -149,6 +152,9 @@ feature -- returns a string representation of the grid
 				i := i + 1
 			end
 			Result := my_grid
+
+		ensure
+			Result /= ""
 		end
 
 end
